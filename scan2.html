@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  </head>
+  <body>
+    <a-scene
+      mindar-image="imageTargetSrc: ./cow1.mind;"
+      vr-mode-ui="enabled: false"
+      embedded
+      renderer="colorManagement: true, physicallyCorrectLights"
+      device-orientation-permission-ui="enabled: true"
+    >
+      <a-assets>
+        <video
+          id="myvideo"
+          src="./playful_cow.mp4"
+          preload="auto"
+          crossorigin="anonymous"
+          playsinline
+          webkit-playsinline
+          muted
+        ></video>
+      </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <a-entity mindar-image-target="targetIndex: 0" id="video-target">
+        <a-video
+          src="#myvideo"
+          width="1"
+          height="0.56"
+          position="0 0 0"
+          rotation="0 0 0"
+        ></a-video>
+      </a-entity>
+    </a-scene>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const video = document.querySelector("#myvideo");
+        const target = document.querySelector("#video-target");
+
+        target.addEventListener("targetFound", () => {
+          video.play();
+        });
+
+        target.addEventListener("targetLost", () => {
+          video.pause();
+        });
+
+        // برای گرفتن اجازه استفاده از دوربین در iOS و Android
+        if (
+          typeof DeviceOrientationEvent !== "undefined" &&
+          typeof DeviceOrientationEvent.requestPermission === "function"
+        ) {
+          DeviceOrientationEvent.requestPermission().catch(() => {
+            alert("لطفاً دسترسی به سنسور دستگاه را در مرورگر فعال کنید.");
+          });
+        }
+
+        // اطمینان از گرفتن اجازه دوربین (فقط در صورت نیاز، مثلاً برای تست دستی)
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .catch((err) => {
+              alert("اجازه دسترسی به دوربین داده نشد. لطفاً اجازه بدهید.");
+              console.error(err);
+            });
+        }
+      });
+    </script>
+  </body>
+</html>
+
+
